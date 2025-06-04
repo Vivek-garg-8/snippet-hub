@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono , Poppins} from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import GlobalContextProvider from "@/ContextApi";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -9,9 +10,9 @@ const geistSans = Geist({
 });
 
 const poppins = Poppins({
-  subsets: ['latin'],
-  variable: '--font-poppins',
-  weight: ['300' , '200' , '400' , '500' , '600' , '700' , '800' , '900'],
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  weight: ["300", "200", "400", "500", "600", "700", "800", "900"],
 });
 
 const geistMono = Geist_Mono({
@@ -32,9 +33,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <ClerkProvider>
-        <body className={poppins.className}>
-          {children}
-        </body>
+        <GlobalContextProvider>
+          <body className={poppins.className}>{children}</body>
+        </GlobalContextProvider>
       </ClerkProvider>
     </html>
   );

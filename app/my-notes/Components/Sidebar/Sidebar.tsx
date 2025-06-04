@@ -5,6 +5,8 @@ import BorderAllIcon from "@mui/icons-material/BorderAll";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import {SiPython , SiCplusplus , SiJavascript } from "react-icons/si";
+import { useGlobalContext } from "@/ContextApi";
+
 export default function Sidebar(){
     return (
         <div className="w-[20%] p-5 flex flex-col gap-2 h-screen pt-7 border-r ">
@@ -29,24 +31,39 @@ export default function Sidebar(){
     }
 
     function QuickLinks() {
+        const {
+            sideBarMenuObject: { sideBarMenu , setSideBarMenu },
+        } = useGlobalContext();
+        console.log(sideBarMenu);
+
+        function clickedMenu(index: number){
+            const updatedSideBarMenu = sideBarMenu.map((menu , i) => {
+                if(i == index){
+                    return {...menu , isSelected: true};
+                }else{
+                    return {...menu , isSelected:false};
+                }
+            });
+
+            setSideBarMenu(updatedSideBarMenu);
+        }
+
         return (
             <div className="mt-20 text-sm">
                 <div className="font-bold text-slate-400">
                     Quick Links
                 </div>
                 <ul className="text-slate-400 mt-4 flex flex-col gap-2 ">
-                    <li className="flex gap-1 items-center bg-purple-600 text-white p-[6px] px-2 rounded-md w-[60%] ">
-                        <BorderAllIcon sx={{fontSize: 18 }}/>
-                        <span>All Snippets</span>
-                    </li>
-                    <li className="flex gap-1 items-center p-[7px] px-2 rounded-md w-[60%] hover:bg-purple-600 hover:text-white ">
-                        <FavoriteBorderIcon sx={{fontSize:18}} />
-                        <span>Favorites</span>
-                    </li>
-                    <li className="flex gap-1 items-center p-[7px] px-2 rounded-md w-[60%] hover:bg-purple-600 hover:text-white ">
-                        <DeleteOutlineOutlinedIcon sx={{fontSize:18}} />
-                        <span>Trash</span>
-                    </li>
+                    {sideBarMenu.map((menu , index) => (
+                        <li 
+                            key={index}
+                            onClick={() => clickedMenu(index)}
+                            className= {`flex cursor-pointer select-none gap-1 items-center ${menu.isSelected ? " bg-purple-600 text-white " :  "text-slate-400 "} p-[6px] px-2 rounded-md w-[60%]`}
+                        >
+                        {menu.icons}
+                        <span>{menu.name} </span>
+                        </li>
+                    ))}
                 </ul>
             </div>
         );
