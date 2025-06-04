@@ -8,7 +8,7 @@ import { headers } from 'next/headers'
 export async function POST(req: NextRequest) {
   try {
     const headerPayload = headers()
-    const secret = process.env.CLERK_WEBHOOK_SECRET
+    const secret = process.env.CLERK_WEBHOOK_SIGNING_SECRET
 
     const evt = await verifyWebhook(req, {
       signingSecret: secret || '',
