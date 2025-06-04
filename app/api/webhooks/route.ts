@@ -1,4 +1,5 @@
 import { verifyWebhook } from '@clerk/nextjs/webhooks'
+import { clerkClient } from '@clerk/nextjs/server'
 import { NextRequest } from 'next/server'
 import connect from '@/app/lib/connect'
 import User from '@/app/Models/UserSchema'
@@ -10,37 +11,65 @@ export async function POST(req: NextRequest) {
     const evt = await verifyWebhook(req)
     console.log("✅ Webhook verified successfully")
     console.log("📋 Event type:", evt.type)
-    console.log("📋 Event data:", JSON.stringify(evt.data, null, 2))
 
-    if (evt.type === 'user.created') {
-      console.log("👤 Processing user.created event")
+    // Handle both user.created and session.created events
+    if (evt.type === 'user.created' || evt.type === 'session.created') {
+      console.log(`👤 Processing ${evt.type} event`)
       
-      const { id, email_addresses } = evt.data;
-      console.log("🆔 User ID:", id)
-      console.log("📧 Email addresses:", email_addresses)
-
-      const newUser = {
-        clerkUserId: id,
-        emailAddress: email_addresses[0].email_address,
-      };
-      console.log("🔨 New user object:", newUser)
-
-      try {
-        console.log("🔌 Attempting to connect to database...")
-        await connect();
-        console.log("✅ Database connected successfully")
+      let userId, userEmail;
+      
+      if (evt.type === 'user.created') {
+        // Direct user creation event
+        userId = evt.data.id;
+        userEmail = evt.data.email_addresses[0]?.email_address;
+      } else if (evt.type === 'session.created') {
+        // Session created - fetch user data from Clerk
+        userId = evt.data.user_id;
+        console.log("🔍 Fetching user data for ID:", userId);
         
-        console.log("💾 Attempting to create user...")
-        const createdUser = await User.create(newUser);
-        console.log("🎉 User created successfully:", createdUser)
-        
-      } catch (error) {
-        console.error("❌ Database error:", error)
-        console.error("❌ Error details:", error)
-        console.error("❌ Stack trace:", error)
+        try {
+          // Await clerkClient first, then call users.getUser
+          const clerk = await clerkClient();
+          const user = await clerk.users.getUser(userId);
+          userEmail = user.emailAddresses[0]?.emailAddress;
+          console.log("📧 Fetched user email:", userEmail);
+        } catch (error) {
+          console.error("❌ Error fetching user from Clerk:", error);
+          return new Response('Error fetching user data', { status: 500 });
+        }
+      }
+
+      if (userId && userEmail) {
+        try {
+          console.log("🔌 Connecting to database...")
+          await connect();
+          
+          // Check if user already exists to avoid duplicates
+          const existingUser = await User.findOne({ clerkUserId: userId });
+          if (existingUser) {
+            console.log("👤 User already exists in database");
+            return new Response('User already exists', { status: 200 });
+          }
+          
+          const newUser = {
+            clerkUserId: userId,
+            emailAddress: userEmail,
+          };
+          
+          console.log("💾 Creating new user:", newUser);
+          const createdUser = await User.create(newUser);
+          console.log("🎉 User created successfully:", createdUser);
+          
+        } catch (error) {
+          console.error("❌ Database error:", error);
+          return new Response('Database error', { status: 500 });
+        }
+      } else {
+        console.error("❌ Missing userId or userEmail");
+        return new Response('Missing user data', { status: 400 });
       }
     } else {
-      console.log("⏭️ Skipping event type:", evt.type)
+      console.log("⏭️ Skipping event type:", evt.type);
     }
 
     return new Response('Webhook received', { status: 200 })
