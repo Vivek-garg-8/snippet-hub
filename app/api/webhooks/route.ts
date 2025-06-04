@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
         clerkUserId: id,
         emailAddress: email_addresses[0].email_address,
       };
+      console.log(email_addresses);
 
       try {
         await connect();
