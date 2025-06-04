@@ -1,35 +1,35 @@
-import connect from "@/app/lib/connect";
-import User from "@/app/Models/UserSchema";
-import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { NextRequest } from "next/server";
+import connect from '@/app/lib/connect'
+import User from '@/app/Models/UserSchema'
+import { verifyWebhook } from '@clerk/nextjs/webhooks'
+import { NextRequest } from 'next/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const evt = await verifyWebhook(req);
-    if (evt.type === "user.created") {
-      const { id, email_addresses } = evt.data;
+    const evt = await verifyWebhook(req)
 
-      const primary = Array.isArray(email_addresses) && email_addresses.length > 0
-        ? email_addresses[0].email_address
-        : null;
+    const { id } = evt.data
+    const eventType = evt.type
+    if (evt.type === 'user.created') {
+      const {id , email_addresses} = evt.data;
 
       const newUser = {
         clerkUserId: id,
-        emailAddress: primary, 
+        emailAddress: email_addresses[0].email_address,
       };
 
       try {
         await connect();
         await User.create(newUser);
         console.log("user created");
-      } catch (error) {
-        console.error("Failed to create user:", error);
-      }
-    }
+      }catch (error) {}
 
-    return new Response("Webhook received", { status: 200 });
+    }
+    console.log(`Received webhook with ID ${id} and event type of ${eventType}`)
+    console.log('Webhook payload:', evt.data)
+
+    return new Response('Webhook received', { status: 200 })
   } catch (err) {
-    console.error("Error verifying webhook:", err);
-    return new Response("Error verifying webhook", { status: 400 });
+    console.error('Error verifying webhook:', err)
+    return new Response('Error verifying webhook', { status: 400 })
   }
 }
