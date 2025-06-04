@@ -5,12 +5,7 @@ import User from '@/app/Models/UserSchema'
 
 export async function POST(req: NextRequest) {
   try {
-    const headerPayload = headers()
-    const secret = process.env.CLERK_WEBHOOK_SIGNING_SECRET
-
-    const evt = await verifyWebhook(req, {
-      signingSecret: secret || '',
-    })
+    const evt = await verifyWebhook(req)
 
     // Do something with payload
     // For this guide, log payload to console
