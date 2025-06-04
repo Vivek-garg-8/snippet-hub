@@ -1,19 +1,14 @@
-import connect from '@/app/lib/connect'
-import User from '@/app/Models/UserSchema'
 import { verifyWebhook } from '@clerk/nextjs/webhooks'
 import { NextRequest } from 'next/server'
-import { headers } from 'next/headers'
-
+import connect from '@/app/lib/connect'
+import User from '@/app/Models/UserSchema'
 
 export async function POST(req: NextRequest) {
   try {
-    const headerPayload = headers()
-    const secret = process.env.CLERK_WEBHOOK_SECRET
+    const evt = await verifyWebhook(req)
 
-    const evt = await verifyWebhook(req, {
-      signingSecret: secret || '',
-    })
-
+    // Do something with payload
+    // For this guide, log payload to console
     const { id } = evt.data
     const eventType = evt.type
     if (evt.type === 'user.created') {
