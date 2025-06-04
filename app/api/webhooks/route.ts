@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
       const newUser = {
         clerkUserId: id,
-        email_addresses: email_addresses[0].email_address,
+        emailAddress: email_addresses[0].email_address,
       };
 
       try {
