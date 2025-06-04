@@ -1,4 +1,3 @@
-// App.tsx (or Home.tsx)
 "use client";
 
 import { mainColor } from "@/Colors";
