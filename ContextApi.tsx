@@ -4,12 +4,18 @@ import BorderAllIcon from "@mui/icons-material/BorderAll";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import LogoutIcon from '@mui/icons-material/Logout';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 interface GlobalContextType {
   sideBarMenuObject: {
     sideBarMenu: SideBarMenu[];
     setSideBarMenu: React.Dispatch<React.SetStateAction<SideBarMenu[]>>;
   };
+  darkModeObject: {
+    darkMode: DarkModeType[];
+    setDarkMode: React.Dispatch<React.SetStateAction<DarkModeType[]>>;
+  }
 }
 
 interface SideBarMenu {
@@ -19,11 +25,21 @@ interface SideBarMenu {
   icons: React.ReactNode;
 }
 
+interface DarkModeType {
+    id: number;
+    icon: React.ReactNode;
+    isSelected: boolean;
+}
+
 const ContextProvider = createContext<GlobalContextType>({
   sideBarMenuObject: {
     sideBarMenu: [],
     setSideBarMenu: () => {},
   },
+  darkModeObject: {
+    darkMode: [],
+    setDarkMode: () => {},
+  }
 });
 
 export default function GlobalContextProvider({
@@ -57,9 +73,24 @@ export default function GlobalContextProvider({
         icons: <LogoutIcon sx={{fontSize:18}} />,
     }
   ]);
+  const [darkMode  , setDarkMode] = useState<DarkModeType[]>([
+    {
+        id: 1,
+        icon: <LightModeIcon />,
+        isSelected: true,
+    },
+    {
+        id: 2,
+        icon: <DarkModeIcon />,
+        isSelected: false,
+    }
+  ]);
   return (
     <ContextProvider.Provider
-      value={{ sideBarMenuObject: { sideBarMenu, setSideBarMenu } }}
+      value={{ 
+        sideBarMenuObject: { sideBarMenu, setSideBarMenu },
+        darkModeObject: {darkMode , setDarkMode}, 
+    }}
     >
       {children}
     </ContextProvider.Provider>
