@@ -1,3 +1,5 @@
+"use client";
+
 import { UserButton } from "@clerk/nextjs";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import ContentArea from "./Components/ContentArea/ContentArea";

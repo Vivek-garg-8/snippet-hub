@@ -19,7 +19,7 @@ function DarkMode(){
     }
 
     return (
-        <div className="bg-slate-100 h-[36px] w-[74px] rounded-3xl flex items-center gap-2 pl-[5px] ">
+        <div className={`${darkMode[1].isSelected ? "text-slate-700 " : "bg-slate-100"} h-[36px] w-[74px] rounded-3xl flex items-center gap-2 pl-[5px] `}>
             {darkMode.map((item , index) => {
                 return (
                     <div className={` ${item.isSelected ? "bg-purple-600 text-white " : "bg-slate-100 text-purple-600"}

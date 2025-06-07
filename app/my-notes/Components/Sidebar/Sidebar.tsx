@@ -8,8 +8,13 @@ import {SiPython , SiCplusplus , SiJavascript } from "react-icons/si";
 import { useGlobalContext } from "@/ContextApi";
 
 export default function Sidebar(){
+    const {
+        darkModeObject: { darkMode }, 
+        openSideBarObject: {openSideBar , setOpenSideBar},
+    } = useGlobalContext();
+
     return (
-        <div className="w-[20%] p-5 flex flex-col gap-2 h-screen pt-7 border-r ">
+        <div className={` ${openSideBar? "fixed z-50 shadow-lg" : "max-md:hidden"} pr-10  p-6 flex flex-col gap-2 h-screen pt-7 ${darkMode[1].isSelected ? "bg-slate-800 " : "bg-white "} `}>
             <Logo />
             <QuickLinks />
             <Languages />
@@ -24,7 +29,7 @@ export default function Sidebar(){
                 </div>
                 <div className="flex gap-1 text-[19px] " >
                     <span className={`font-bold text-purple-600 `}>Snippet</span>
-                    <span className="text-slate-600">Master</span>
+                    <span className="text-slate-400">Master</span>
                 </div>
             </div>
         );
@@ -58,7 +63,7 @@ export default function Sidebar(){
                         <li 
                             key={index}
                             onClick={() => clickedMenu(index)}
-                            className= {`flex cursor-pointer select-none gap-1 items-center ${menu.isSelected ? " bg-purple-600 text-white " :  "text-slate-400 "} p-[6px] px-2 rounded-md w-[60%]`}
+                            className= {`flex cursor-pointer select-none gap-1 items-center ${menu.isSelected ? " bg-purple-600 text-white " :  "text-slate-400 "} p-[6px] px-2 rounded-md w-[80%]`}
                         >
                         {menu.icons}
                         <span>{menu.name} </span>
